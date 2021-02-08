@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -19,16 +21,16 @@ import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity implements  View.OnTouchListener, GestureDetector.OnGestureListener{
-    private View gestureCatcher;
     private boolean setting_password;
 
     private ArrayList<Integer> password, attempt;
 
 
     private GestureDetector gestureDetector;
-    private Button switchModesButton, clearButton;
+    private Button switchModesButton;
     private EditText hint;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,30 +39,24 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
         setting_password = false;
         this.hint = findViewById(R.id.editTextTextPassword);
         this.switchModesButton = findViewById(R.id.button);
-        this.clearButton = findViewById(R.id.button2);
-        this.switchModesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setting_password = !setting_password;
+        Button clearButton = findViewById(R.id.button2);
+        this.switchModesButton.setOnClickListener(v -> {
+            setting_password = !setting_password;
 
-                if (setting_password) {
-                    switchModesButton.setText("Set Password");
-                } else {
-                    switchModesButton.setText("Authenticate");
-                }
+            if (setting_password) {
+                switchModesButton.setText("Set Password");
+            } else {
+                switchModesButton.setText("Authenticate");
             }
         });
 
-        this.clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                attempt.clear();
-                hint.setText("");
-            }
+        clearButton.setOnClickListener(v -> {
+            attempt.clear();
+            hint.setText("");
         });
 
-        this.gestureCatcher = findViewById(R.id.gestureCatcher);
-        this.gestureCatcher.setOnTouchListener(this);
+        View gestureCatcher = findViewById(R.id.gestureCatcher);
+        gestureCatcher.setOnTouchListener(this);
         gestureDetector = new GestureDetector(this,this);
 
         attempt = new ArrayList<>();
@@ -76,15 +72,16 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         gestureDetector.onTouchEvent(event);
-        String temp = "";
+        StringBuilder temp = new StringBuilder();
 
-        for(int i: this.attempt){
-            temp += "T";
+        for(int i=0; i < this.attempt.size(); i++){
+            temp.append("T");
         }
-        this.hint.setText(temp);
+        this.hint.setText(temp.toString());
         return true;
     }
 
