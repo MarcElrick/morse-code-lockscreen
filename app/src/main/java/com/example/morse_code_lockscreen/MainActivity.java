@@ -1,8 +1,11 @@
 package com.example.morse_code_lockscreen;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +20,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextClock;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -27,28 +33,36 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
 
 
     private GestureDetector gestureDetector;
-    private Button switchModesButton;
+    private ImageButton authenticateButton;
     private EditText hint;
+    private TextView date;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().hide();
 
         setting_password = false;
         this.hint = findViewById(R.id.editTextTextPassword);
-        this.switchModesButton = findViewById(R.id.button);
-        Button clearButton = findViewById(R.id.button2);
-        this.switchModesButton.setOnClickListener(v -> {
-            setting_password = !setting_password;
+        this.date = findViewById(R.id.date);
+        this.authenticateButton = findViewById(R.id.button);
+        ImageButton clearButton = findViewById(R.id.button2);
+        this.authenticateButton.setOnClickListener(v -> {
+         //   setting_password = !setting_password;
 
-            if (setting_password) {
-                switchModesButton.setText("Set Password");
-            } else {
-                switchModesButton.setText("Authenticate");
-            }
+//            if (setting_password) {
+//                authenticateButton.setText("Set Password");
+//            } else {
+//                authenticateButton.setText("Authenticate");
+//            }
         });
+
+        Date today = Calendar.getInstance().getTime();//getting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd MMM");//formating according to my need
+        String d = formatter.format(today);
+        date.setText(d +"  "+ new String(Character.toChars(0x1F324)));
 
         clearButton.setOnClickListener(v -> {
             attempt.clear();
