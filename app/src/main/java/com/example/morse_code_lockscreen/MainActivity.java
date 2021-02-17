@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         this.authenticateButton.setOnClickListener(v -> {
             if(!this.password.equals(this.attempt)) {
                 Toast.makeText(getApplicationContext(), "Incorrect Password", Toast.LENGTH_SHORT).show();
+                attempt.clear();
+                hint.setText("");
             } else {
                 Intent intent = new Intent(this, SuccessActivity.class);
                 startActivity(intent);
