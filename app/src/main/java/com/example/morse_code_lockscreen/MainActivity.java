@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -18,21 +19,21 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-public class MainActivity extends AppCompatActivity implements  View.OnTouchListener, GestureDetector.OnGestureListener{
-    private boolean setting_password;
-
-    private ArrayList<Integer> password, attempt;
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
-    private GestureDetector gestureDetector;
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener {
+    private boolean isLeft = true;
+
+    private ArrayList<TouchState> password, attempt;
+
+
+    private GestureDetector gestureDetectorLeft, gestureDetectorRight;
     private ImageButton authenticateButton;
     private EditText hint;
     private TextView date;
@@ -44,39 +45,43 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        setting_password = false;
         this.hint = findViewById(R.id.editTextTextPassword);
         this.date = findViewById(R.id.date);
         this.authenticateButton = findViewById(R.id.button);
         ImageButton clearButton = findViewById(R.id.button2);
         this.authenticateButton.setOnClickListener(v -> {
-         //   setting_password = !setting_password;
-
-//            if (setting_password) {
-//                authenticateButton.setText("Set Password");
-//            } else {
-//                authenticateButton.setText("Authenticate");
-//            }
+            if(!this.password.equals(this.attempt)) {
+                Toast.makeText(getApplicationContext(), "Incorrect Password", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent intent = new Intent(this, SuccessActivity.class);
+                startActivity(intent);
+            }
         });
 
         Date today = Calendar.getInstance().getTime();//getting date
         SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd MMM");//formating according to my need
         String d = formatter.format(today);
-        date.setText(d +"  "+ new String(Character.toChars(0x1F324)));
+        date.setText(d + "  " + new String(Character.toChars(0x1F324)));
 
         clearButton.setOnClickListener(v -> {
             attempt.clear();
             hint.setText("");
         });
 
-        View gestureCatcher = findViewById(R.id.gestureCatcher);
-        gestureCatcher.setOnTouchListener(this);
-        gestureDetector = new GestureDetector(this,this);
+        View gestureCatcherLeft = findViewById(R.id.gestureCatcherLeft);
+        View gestureCatcherRight = findViewById(R.id.gestureCatcherRight);
+
+
+        gestureCatcherLeft.setOnTouchListener(this);
+        gestureCatcherRight.setOnTouchListener(this);
+        gestureDetectorLeft = new GestureDetector(this, this);
+        gestureDetectorRight = new GestureDetector(this, this);
+
 
         attempt = new ArrayList<>();
         password = new ArrayList<>();
 
-        password.addAll(Arrays.asList(0,0,0,0,1));
+        password.addAll(Arrays.asList(TouchState.SHORT_LEFT, TouchState.SHORT_LEFT, TouchState.SHORT_LEFT, TouchState.LONG_RIGHT));
     }
 
     private void vibrate() {
@@ -89,10 +94,18 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
+        if (v.getId() == R.id.gestureCatcherLeft) {
+            isLeft = true;
+            gestureDetectorLeft.onTouchEvent(event);
+        }
+
+        if (v.getId() == R.id.gestureCatcherRight) {
+            isLeft = false;
+            gestureDetectorRight.onTouchEvent(event);
+        }
         StringBuilder temp = new StringBuilder();
 
-        for(int i=0; i < this.attempt.size(); i++){
+        for (int i = 0; i < this.attempt.size(); i++) {
             temp.append("T");
         }
         this.hint.setText(temp.toString());
@@ -111,9 +124,13 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        this.attempt.add(0);
+        if (isLeft) {
+            this.attempt.add(TouchState.SHORT_LEFT);
+        } else {
+            this.attempt.add(TouchState.SHORT_RIGHT);
+        }
         Log.d("ResultShort", attempt.toString());
-        this.validate();
+
         return false;
     }
 
@@ -124,22 +141,16 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
 
     @Override
     public void onLongPress(MotionEvent e) {
-        this.attempt.add(1);
+        if (isLeft) {
+            this.attempt.add(TouchState.LONG_LEFT);
+        } else {
+            this.attempt.add(TouchState.LONG_RIGHT);
+        }
         Log.d("ResultLong", attempt.toString());
-        this.validate();
         this.vibrate();
 
     }
 
-    private void validate() {
-        if(attempt.size() != password.size()){
-            return;
-        }
-
-        if(this.attempt.equals(this.password)) {
-            Toast.makeText(getApplicationContext(), "Match", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
