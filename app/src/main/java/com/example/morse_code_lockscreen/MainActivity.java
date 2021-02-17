@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements  View.OnTouchList
             setting_password = !setting_password;
 
             if (setting_password) {
+
                 switchModesButton.setText("Set Password");
             } else {
                 switchModesButton.setText("Authenticate");
