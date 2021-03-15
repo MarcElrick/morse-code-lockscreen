@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         ImageButton clearButton = findViewById(R.id.button2);
         this.authenticateButton.setOnClickListener(v -> {
             if(!this.password.equals(this.attempt)) {
+                Log.d("INCORRECT PASSWORD", this.password.toString());
                 Toast.makeText(getApplicationContext(), "Incorrect Password", Toast.LENGTH_SHORT).show();
                 attempt.clear();
                 hint.setText("");
