@@ -19,3 +19,9 @@ An exciting, experimental method of unlocking your mobile device.
 1. Plug in device via USB.
 1. Ensure device is selected in device menu(top bar)
 1. Click the "Run" button at the top.
+
+
+## Default Password
+ - Default password is SHORT_LEFT, SHORT_RIGHT, LONG_LEFT, LONG_RIGHT. 
+ - Password can be changed via an array named 'password' within ```MainActivity.java``` which is an enum type.
+ - This enum has types ```SHORT_LEFT```,```SHORT_RIGHT```,```LONG_LEFT```,```LONG_RIGHT```.
